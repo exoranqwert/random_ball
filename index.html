@@ -45,30 +45,31 @@
         }
         
         .container {
-            background: rgba(255, 255, 255, 0.45); /* еще прозрачнее */
+            background: rgba(255, 255, 255, 0.4);
             border-radius: 30px;
-            padding: 15px; /* уменьшил padding */
+            padding: 20px;
             margin: 15px;
-            max-width: 300px; /* уменьшил максимальную ширину */
+            max-width: 300px;
             width: 100%;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             position: relative;
             z-index: 1;
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         h1 {
             color: #4a2b7a;
-            font-size: 16px; /* уменьшил размер */
-            margin: 5px 0 10px 0;
+            font-size: 20px;
+            margin: 5px 0 15px 0;
             text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
         }
         
         .ball {
-            width: 70px; /* уменьшил почти в 2 раза (было 250) */
-            height: 140px;
+            width: 100px;
+            height: 100px;
             background: radial-gradient(circle at 30% 30%, #333, #000);
             border-radius: 50%;
             margin: 10px auto;
@@ -95,14 +96,14 @@
         }
         
         .ball-inner {
-            width: 35px; /* уменьшил пропорционально */
-            height: 35px;
+            width: 45px;
+            height: 45px;
             background: #fff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px; /* уменьшил */
+            font-size: 24px;
             color: #333;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
             transition: all 0.2s;
@@ -119,19 +120,20 @@
         
         input {
             width: 85%;
-            padding: 12px; /* чуть меньше */
+            padding: 15px; /* увеличил высоту */
             font-size: 16px;
             border: 2px solid #ddd;
             border-radius: 25px;
-            margin: 10px 0 5px 0;
+            margin: 15px 0 10px 0;
             background: rgba(255, 255, 255, 0.95);
+            box-sizing: border-box; /* чтобы padding не увеличивал ширину */
         }
         
         button {
             background: #667eea;
             color: white;
             border: none;
-            padding: 12px 25px; /* чуть меньше */
+            padding: 15px 25px; /* увеличил высоту */
             font-size: 16px;
             border-radius: 25px;
             cursor: pointer;
@@ -151,12 +153,23 @@
             padding: 15px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            font-size: 20px;
+            font-size: 18px;
             color: #333;
             min-height: 60px;
             border: 2px solid #667eea;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             font-weight: bold;
+            word-break: break-word; /* чтобы длинные слова переносились */
+        }
+
+        /* Отключаем выделение кнопки при нажатии */
+        button:focus {
+            outline: none;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
         }
     </style>
 </head>
@@ -215,21 +228,21 @@
             "ну хуй знает"
         ];
         
-        // Исправление проблемы с кнопкой на ноутбуке
-        document.addEventListener('DOMContentLoaded', function() {
-            const button = document.querySelector('button');
+        // Ставим фокус на поле ввода при загрузке
+        window.addEventListener('load', function() {
             const input = document.getElementById('question');
-            
-            // Убираем фокус с кнопки при загрузке
-            if (button) {
-                button.blur();
-            }
-            
-            // Ставим фокус на поле ввода
             if (input) {
                 input.focus();
             }
         });
+
+        // Отключаем возможность фокуса на кнопке
+        const button = document.querySelector('button');
+        if (button) {
+            button.addEventListener('mousedown', function(e) {
+                e.preventDefault(); // предотвращает фокус на кнопке
+            });
+        }
         
         function shakeBall() {
             const question = document.getElementById('question');
@@ -237,9 +250,9 @@
             const ballNumber = document.getElementById('ballNumber');
             const answer = document.getElementById('answer');
             
-            if (!question.value) {
+            if (!question.value.trim()) {
                 alert('Сначала задай вопрос!');
-                question.focus(); // ставим фокус обратно на поле ввода
+                question.focus();
                 return;
             }
             
@@ -268,14 +281,16 @@
                     
                     ballNumber.textContent = '8';
                     
-                    // Возвращаем фокус на поле ввода для следующего вопроса
-                    setTimeout(() => {
-                        question.focus();
-                    }, 100);
+                    // НЕ возвращаем фокус автоматически, чтобы не мешать
+                    // Пользователь сам может кликнуть на поле ввода
                 }
             }, 100);
         }
+
+        // Обработка клика по шару (на случай, если нужно вернуть фокус)
+        document.getElementById('ball').addEventListener('click', function() {
+            // Не делаем ничего, просто чтобы не мешать
+        });
     </script>
 </body>
 </html>
-
