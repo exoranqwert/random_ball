@@ -15,7 +15,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            overflow: hidden;
+            overflow: auto;  /* изменено с hidden на auto */
         }
         
         /* Звездное небо */
@@ -45,7 +45,7 @@
         }
         
         .container {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.85); /* чуть прозрачнее */
             border-radius: 30px;
             padding: 30px;
             margin: 20px;
@@ -56,7 +56,7 @@
             position: relative;
             z-index: 1;
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2); /* тоньше окантовка */
         }
         
         h1 {
@@ -75,10 +75,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             cursor: pointer;
             transition: transform 0.1s;
             position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3); /* тонкая белая окантовка */
         }
         
         .ball.shaking {
@@ -123,7 +124,7 @@
             border: 2px solid #ddd;
             border-radius: 25px;
             margin: 10px 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
         }
         
         button {
@@ -172,9 +173,7 @@
         <input type="text" id="question" placeholder="Задай вопрос..." onkeypress="if(event.key==='Enter') shakeBall()">
         <button onclick="shakeBall()">🔮 Спросить шар</button>
         
-        <div class="answer" id="answer">
-            Задай вопрос...
-        </div>
+        <div class="answer" id="answer"></div> <!-- убрал текст внутри -->
     </div>
 
     <script>
@@ -205,7 +204,7 @@
         
         createStars();
 
-        // Ответы шара (твои новые)
+        // Ответы шара
         const answers = [
             "да, жб",
             "не, ну его нахуй",
@@ -217,16 +216,18 @@
         ];
         
         function shakeBall() {
-            const question = document.getElementById('question').value;
+            const question = document.getElementById('question');
+            const ball = document.getElementById('ball');
+            const ballNumber = document.getElementById('ballNumber');
+            const answer = document.getElementById('answer');
             
-            if (!question) {
+            if (!question.value) {
                 alert('Сначала задай вопрос!');
                 return;
             }
             
-            const ball = document.getElementById('ball');
-            const ballNumber = document.getElementById('ballNumber');
-            const answer = document.getElementById('answer');
+            // Убираем клавиатуру на телефоне
+            question.blur();
             
             // Добавляем анимацию тряски
             ball.classList.add('shaking');
@@ -239,19 +240,15 @@
                 ballNumber.textContent = randomNum;
                 spinCount++;
                 
-                // Останавливаем через 1.5 секунды (примерно 15-20 прокруток)
                 if (spinCount > 15) {
                     clearInterval(spinInterval);
                     
-                    // Убираем анимации
                     ball.classList.remove('shaking');
                     ball.classList.remove('thinking');
                     
-                    // Показываем ответ
                     const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
                     answer.innerHTML = `🎱 ${randomAnswer}`;
                     
-                    // Ставим обратно 8
                     ballNumber.textContent = '8';
                 }
             }, 100);
