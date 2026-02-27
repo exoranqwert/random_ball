@@ -9,28 +9,61 @@
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Звездное небо */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite;
+            opacity: var(--opacity);
+            width: var(--size);
+            height: var(--size);
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--opacity); }
+            50% { opacity: calc(var(--opacity) * 0.3); }
         }
         
         .container {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 30px;
             padding: 30px;
             margin: 20px;
             max-width: 500px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         h1 {
             color: #4a2b7a;
             font-size: 36px;
             margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
         }
         
         .ball {
@@ -42,13 +75,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.3);
             cursor: pointer;
-            transition: 0.3s;
+            transition: transform 0.1s;
+            position: relative;
         }
         
-        .ball:hover {
-            transform: scale(1.05);
+        .ball.shaking {
+            animation: shake 0.5s infinite;
+        }
+        
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            50% { transform: rotate(-10deg); }
+            75% { transform: rotate(5deg); }
+            100% { transform: rotate(0deg); }
         }
         
         .ball-inner {
@@ -59,13 +101,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 60px;
             color: #333;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+            transition: all 0.2s;
         }
         
-        .question-box {
-            margin: 20px 0;
+        .ball.thinking .ball-inner {
+            animation: spin 0.3s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         input {
@@ -75,6 +123,7 @@
             border: 2px solid #ddd;
             border-radius: 25px;
             margin: 10px 0;
+            background: rgba(255, 255, 255, 0.9);
         }
         
         button {
@@ -86,59 +135,80 @@
             border-radius: 25px;
             cursor: pointer;
             width: 80%;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
         }
         
         .answer {
             margin-top: 30px;
             padding: 20px;
-            background: #f0f0f0;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             font-size: 24px;
             color: #333;
             min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .history {
-            margin-top: 20px;
-            text-align: left;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .history-item {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            color: #666;
+            border: 2px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
+    <div id="stars"></div>
+    
     <div class="container">
         <h1>🎱 Магический шар</h1>
         
-        <div class="ball" onclick="shakeBall()">
+        <div class="ball" id="ball" onclick="shakeBall()">
             <div class="ball-inner" id="ballNumber">8</div>
         </div>
         
-        <div class="question-box">
-            <input type="text" id="question" placeholder="Задай вопрос..." onkeypress="if(event.key==='Enter') shakeBall()">
-            <button onclick="shakeBall()">🔮 Спросить шар</button>
-        </div>
+        <input type="text" id="question" placeholder="Задай вопрос..." onkeypress="if(event.key==='Enter') shakeBall()">
+        <button onclick="shakeBall()">🔮 Спросить шар</button>
         
         <div class="answer" id="answer">
             Задай вопрос...
         </div>
-        
-        <div class="history" id="history"></div>
     </div>
 
     <script>
+        // Создание звезд
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 3 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const opacity = Math.random() * 0.8 + 0.2;
+                const duration = Math.random() * 3 + 2;
+                
+                star.style.setProperty('--size', `${size}px`);
+                star.style.setProperty('--opacity', opacity);
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        createStars();
+
+        // Ответы шара (твои новые)
         const answers = [
             "да, жб",
-	    "не, ну его нахуй",
+            "не, ну его нахуй",
             "ну чет такое, как будто не",
             "похуй, газуй",
             "давай самостоятельно подумай, заебешь",
@@ -146,61 +216,45 @@
             "ну хуй знает"
         ];
         
-        let history = [];
-        
         function shakeBall() {
             const question = document.getElementById('question').value;
             
             if (!question) {
-                alert('Задай вопрос сначала!');
+                alert('Сначала задай вопрос!');
                 return;
             }
             
-            // Анимация шара
-            const ball = document.querySelector('.ball');
+            const ball = document.getElementById('ball');
             const ballNumber = document.getElementById('ballNumber');
+            const answer = document.getElementById('answer');
             
-            ball.style.transform = 'scale(0.9)';
-            setTimeout(() => ball.style.transform = 'scale(1)', 200);
+            // Добавляем анимацию тряски
+            ball.classList.add('shaking');
+            ball.classList.add('thinking');
             
-            // Магия
-            ballNumber.style.opacity = '0';
-            setTimeout(() => {
-                const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
-                document.getElementById('answer').innerHTML = `🎱 ${randomAnswer}`;
-                
-                // Меняем цифру на шаре
+            // Меняем цифры во время "думания"
+            let spinCount = 0;
+            const spinInterval = setInterval(() => {
                 const randomNum = Math.floor(Math.random() * 8) + 1;
                 ballNumber.textContent = randomNum;
-                ballNumber.style.opacity = '1';
+                spinCount++;
                 
-                // Добавляем в историю
-                history.unshift({
-                    question: question,
-                    answer: randomAnswer,
-                    time: new Date().toLocaleTimeString()
-                });
-                
-                if (history.length > 5) history.pop();
-                
-                updateHistory();
-                
-            }, 300);
-        }
-        
-        function updateHistory() {
-            const historyDiv = document.getElementById('history');
-            historyDiv.innerHTML = '<h4>📜 История вопросов:</h4>';
-            
-            history.forEach(item => {
-                historyDiv.innerHTML += `
-                    <div class="history-item">
-                        <small>${item.time}</small><br>
-                        ❓ ${item.question}<br>
-                        🎱 ${item.answer}
-                    </div>
-                `;
-            });
+                // Останавливаем через 1.5 секунды (примерно 15-20 прокруток)
+                if (spinCount > 15) {
+                    clearInterval(spinInterval);
+                    
+                    // Убираем анимации
+                    ball.classList.remove('shaking');
+                    ball.classList.remove('thinking');
+                    
+                    // Показываем ответ
+                    const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
+                    answer.innerHTML = `🎱 ${randomAnswer}`;
+                    
+                    // Ставим обратно 8
+                    ballNumber.textContent = '8';
+                }
+            }, 100);
         }
     </script>
 </body>
