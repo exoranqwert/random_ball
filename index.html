@@ -15,7 +15,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            overflow: auto;  /* изменено с hidden на auto */
+            overflow: auto;
         }
         
         /* Звездное небо */
@@ -45,33 +45,33 @@
         }
         
         .container {
-            background: rgba(255, 255, 255, 0.85); /* чуть прозрачнее */
+            background: rgba(255, 255, 255, 0.7); /* еще прозрачнее */
             border-radius: 30px;
-            padding: 30px;
-            margin: 20px;
-            max-width: 500px;
+            padding: 20px; /* уменьшил padding */
+            margin: 15px;
+            max-width: 400px; /* уменьшил максимальную ширину */
             width: 100%;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             position: relative;
             z-index: 1;
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2); /* тоньше окантовка */
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         h1 {
             color: #4a2b7a;
-            font-size: 36px;
-            margin-bottom: 10px;
+            font-size: 28px; /* уменьшил размер */
+            margin: 5px 0 10px 0;
             text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
         }
         
         .ball {
-            width: 250px;
-            height: 250px;
+            width: 140px; /* уменьшил почти в 2 раза (было 250) */
+            height: 140px;
             background: radial-gradient(circle at 30% 30%, #333, #000);
             border-radius: 50%;
-            margin: 20px auto;
+            margin: 10px auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -79,7 +79,7 @@
             cursor: pointer;
             transition: transform 0.1s;
             position: relative;
-            border: 2px solid rgba(255, 255, 255, 0.3); /* тонкая белая окантовка */
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
         
         .ball.shaking {
@@ -95,14 +95,14 @@
         }
         
         .ball-inner {
-            width: 120px;
-            height: 120px;
+            width: 70px; /* уменьшил пропорционально */
+            height: 70px;
             background: #fff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 60px;
+            font-size: 36px; /* уменьшил */
             color: #333;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
             transition: all 0.2s;
@@ -118,12 +118,12 @@
         }
         
         input {
-            width: 80%;
-            padding: 15px;
+            width: 85%;
+            padding: 12px; /* чуть меньше */
             font-size: 16px;
             border: 2px solid #ddd;
             border-radius: 25px;
-            margin: 10px 0;
+            margin: 10px 0 5px 0;
             background: rgba(255, 255, 255, 0.95);
         }
         
@@ -131,11 +131,11 @@
             background: #667eea;
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
+            padding: 12px 25px; /* чуть меньше */
+            font-size: 16px;
             border-radius: 25px;
             cursor: pointer;
-            width: 80%;
+            width: 85%;
             font-weight: bold;
             transition: 0.3s;
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
@@ -147,13 +147,13 @@
         }
         
         .answer {
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 20px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            font-size: 24px;
+            font-size: 20px;
             color: #333;
-            min-height: 80px;
+            min-height: 60px;
             border: 2px solid #667eea;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             font-weight: bold;
@@ -173,7 +173,7 @@
         <input type="text" id="question" placeholder="Задай вопрос..." onkeypress="if(event.key==='Enter') shakeBall()">
         <button onclick="shakeBall()">🔮 Спросить шар</button>
         
-        <div class="answer" id="answer"></div> <!-- убрал текст внутри -->
+        <div class="answer" id="answer"></div>
     </div>
 
     <script>
@@ -215,6 +215,22 @@
             "ну хуй знает"
         ];
         
+        // Исправление проблемы с кнопкой на ноутбуке
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.querySelector('button');
+            const input = document.getElementById('question');
+            
+            // Убираем фокус с кнопки при загрузке
+            if (button) {
+                button.blur();
+            }
+            
+            // Ставим фокус на поле ввода
+            if (input) {
+                input.focus();
+            }
+        });
+        
         function shakeBall() {
             const question = document.getElementById('question');
             const ball = document.getElementById('ball');
@@ -223,6 +239,7 @@
             
             if (!question.value) {
                 alert('Сначала задай вопрос!');
+                question.focus(); // ставим фокус обратно на поле ввода
                 return;
             }
             
@@ -250,6 +267,11 @@
                     answer.innerHTML = `🎱 ${randomAnswer}`;
                     
                     ballNumber.textContent = '8';
+                    
+                    // Возвращаем фокус на поле ввода для следующего вопроса
+                    setTimeout(() => {
+                        question.focus();
+                    }, 100);
                 }
             }, 100);
         }
